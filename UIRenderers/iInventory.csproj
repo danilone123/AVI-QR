@@ -1,0 +1,437 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3C75F517-D0EB-4ACF-9F8A-E99F96333210}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>iInventory</RootNamespace>
+    <AssemblyName>iInventory</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DevExpress.Charts.v10.1.Core, Version=10.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Data.v10.1, Version=10.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Utils.v10.1, Version=10.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Xpo.v10.1, Version=10.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraBars.v10.1, Version=10.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraCharts.v10.1, Version=10.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraCharts.v10.1.UI, Version=10.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraEditors.v10.1, Version=10.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraGrid.v10.1, Version=10.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraLayout.v10.1, Version=10.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraNavBar.v10.1, Version=10.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="log4net">
+      <HintPath>..\Third-Party\Apache\Log4Net\AnyCPU\1.2.10.0\Debug\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AboutBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutBox.Designer.cs">
+      <DependentUpon>AboutBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CalculadoraVentas.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CalculadoraVentas.Designer.cs">
+      <DependentUpon>CalculadoraVentas.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DescripcionPedidoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DescripcionPedidoForm.Designer.cs">
+      <DependentUpon>DescripcionPedidoForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EgresosIngresos.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="EgresosIngresos.Designer.cs">
+      <DependentUpon>EgresosIngresos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EstadisticasProductos.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="EstadisticasProductos.Designer.cs">
+      <DependentUpon>EstadisticasProductos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormLogin.designer.cs">
+      <DependentUpon>FormLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GridProductos.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GridProductos.Designer.cs">
+      <DependentUpon>GridProductos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="InitCajaForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InitCajaForm.Designer.cs">
+      <DependentUpon>InitCajaForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListaComprasEspeciales.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ListaComprasEspeciales.Designer.cs">
+      <DependentUpon>ListaComprasEspeciales.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListaComprasEspecialesEstable.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ListaComprasEspecialesEstable.Designer.cs">
+      <DependentUpon>ListaComprasEspecialesEstable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListaIventarios.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ListaIventarios.Designer.cs">
+      <DependentUpon>ListaIventarios.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MainMenu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainMenu.Designer.cs">
+      <DependentUpon>MainMenu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ManejadorCaja.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ManejadorCaja.Designer.cs">
+      <DependentUpon>ManejadorCaja.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NuevoInsumo.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NuevoInsumo.Designer.cs">
+      <DependentUpon>NuevoInsumo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PnlInventario.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PnlInventario.Designer.cs">
+      <DependentUpon>PnlInventario.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PnlListaCompras.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PnlListaCompras.designer.cs">
+      <DependentUpon>PnlListaCompras.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PnlListaComprasInsumos.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PnlListaComprasInsumos.Designer.cs">
+      <DependentUpon>PnlListaComprasInsumos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PnlListaInsumos.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PnlListaInsumos.Designer.cs">
+      <DependentUpon>PnlListaInsumos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PnlListaProductos.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PnlListaProductos.Designer.cs">
+      <DependentUpon>PnlListaProductos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PnlListaRecetas.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PnlListaRecetas.Designer.cs">
+      <DependentUpon>PnlListaRecetas.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PnlListaReservas.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PnlListaReservas.Designer.cs">
+      <DependentUpon>PnlListaReservas.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PnlListaUsuarios.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PnlListaUsuarios.Designer.cs">
+      <DependentUpon>PnlListaUsuarios.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PnlNuevaReceta.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PnlNuevaReceta.Designer.cs">
+      <DependentUpon>PnlNuevaReceta.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PnlNuevoPrivilegio.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PnlNuevoPrivilegio.Designer.cs">
+      <DependentUpon>PnlNuevoPrivilegio.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PnlNuevoProducto.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PnlNuevoProducto.Designer.cs">
+      <DependentUpon>PnlNuevoProducto.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PnlVentas.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PnlVentas.Designer.cs">
+      <DependentUpon>PnlVentas.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="ProgressForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProgressForm.Designer.cs">
+      <DependentUpon>ProgressForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReportesComprasEspeciales.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ReportesComprasEspeciales.Designer.cs">
+      <DependentUpon>ReportesComprasEspeciales.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ReportesComprasInsumos.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ReportesComprasInsumos.Designer.cs">
+      <DependentUpon>ReportesComprasInsumos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ReportesVentas.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ReportesVentas.Designer.cs">
+      <DependentUpon>ReportesVentas.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="AboutBox.resx">
+      <DependentUpon>AboutBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CalculadoraVentas.resx">
+      <DependentUpon>CalculadoraVentas.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DescripcionPedidoForm.resx">
+      <DependentUpon>DescripcionPedidoForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EgresosIngresos.resx">
+      <DependentUpon>EgresosIngresos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EstadisticasProductos.resx">
+      <DependentUpon>EstadisticasProductos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormLogin.resx">
+      <DependentUpon>FormLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GridProductos.resx">
+      <DependentUpon>GridProductos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InitCajaForm.resx">
+      <DependentUpon>InitCajaForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ListaComprasEspeciales.resx">
+      <DependentUpon>ListaComprasEspeciales.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ListaComprasEspecialesEstable.resx">
+      <DependentUpon>ListaComprasEspecialesEstable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ListaIventarios.resx">
+      <DependentUpon>ListaIventarios.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainMenu.resx">
+      <DependentUpon>MainMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ManejadorCaja.resx">
+      <DependentUpon>ManejadorCaja.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NuevoInsumo.resx">
+      <DependentUpon>NuevoInsumo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PnlInventario.resx">
+      <DependentUpon>PnlInventario.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PnlListaCompras.resx">
+      <DependentUpon>PnlListaCompras.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PnlListaComprasInsumos.resx">
+      <DependentUpon>PnlListaComprasInsumos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PnlListaInsumos.resx">
+      <DependentUpon>PnlListaInsumos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PnlListaProductos.resx">
+      <DependentUpon>PnlListaProductos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PnlListaRecetas.resx">
+      <DependentUpon>PnlListaRecetas.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PnlListaReservas.resx">
+      <DependentUpon>PnlListaReservas.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PnlListaUsuarios.resx">
+      <DependentUpon>PnlListaUsuarios.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PnlNuevaReceta.resx">
+      <DependentUpon>PnlNuevaReceta.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PnlNuevoPrivilegio.resx">
+      <DependentUpon>PnlNuevoPrivilegio.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PnlNuevoProducto.resx">
+      <DependentUpon>PnlNuevoProducto.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PnlVentas.resx">
+      <DependentUpon>PnlVentas.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProgressForm.resx">
+      <DependentUpon>ProgressForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="ReportesComprasEspeciales.resx">
+      <DependentUpon>ReportesComprasEspeciales.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReportesComprasInsumos.resx">
+      <DependentUpon>ReportesComprasInsumos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReportesVentas.resx">
+      <DependentUpon>ReportesVentas.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\00010.ico" />
+    <Resource Include="Resources\add.png" />
+    <Resource Include="Resources\bbnew.ico" />
+    <Resource Include="Resources\bbsave.ico" />
+    <Resource Include="Resources\close.png" />
+    <Resource Include="Resources\delete.png" />
+    <Resource Include="Resources\edit.png" />
+    <Resource Include="Resources\guardar.png" />
+    <Resource Include="Resources\insumo.png" />
+    <Resource Include="Resources\listaProductos.png" />
+    <Resource Include="Resources\nuevaReceta.png" />
+    <Resource Include="Resources\nuevoInsumo.png" />
+    <Resource Include="Resources\producto.png" />
+    <Resource Include="Resources\receta.png" />
+    <Resource Include="Resources\refresh.png" />
+    <Resource Include="Resources\newItem.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\inventory-maintenance-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\export.png" />
+    <Resource Include="Resources\printpreview.png" />
+    <Resource Include="Resources\styleChange.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\down.png" />
+    <Resource Include="Resources\up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pdf.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\xls.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ventaProductos.png" />
+    <None Include="Resources\ventas.png" />
+    <Resource Include="Resources\chart.png" />
+    <None Include="Resources\chartA.png" />
+    <None Include="Resources\capressoBanner.jpg" />
+    <None Include="Resources\alertIcon.png" />
+    <None Include="Resources\caja.png" />
+    <None Include="Resources\controlCaja.png" />
+    <None Include="Resources\compraInsumos.png" />
+    <None Include="Resources\comprasEspeciales.png" />
+    <Content Include="Resources\defaultPicture.gif" />
+    <None Include="Resources\egresosIngresos.png" />
+    <Content Include="Resources\Info.ico" />
+    <Resource Include="Resources\reserva.png" />
+    <Resource Include="Resources\Users.png" />
+    <Resource Include="Resources\usuarios.png" />
+    <None Include="Resources\reportes.png" />
+    <None Include="Resources\ingresosEgresos.png" />
+    <None Include="Resources\listaCompras.png" />
+    <None Include="Resources\inventarioLarge.png" />
+    <None Include="Resources\screen_Products.png" />
+    <None Include="Resources\screen_Caja.png" />
+    <None Include="Resources\screen_Reportes.png" />
+    <None Include="Resources\screen_Privilegios.png" />
+    <None Include="Resources\screen_Ventas.png" />
+    <Content Include="Resources\ventaProducto.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CommonUtils\CommonUtils.csproj">
+      <Project>{70D88F2B-E286-475B-BF2B-143DE4EFD8CD}</Project>
+      <Name>CommonUtils</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

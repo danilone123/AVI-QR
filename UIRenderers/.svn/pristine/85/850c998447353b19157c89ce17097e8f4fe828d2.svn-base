@@ -1,0 +1,1343 @@
+<<<<<<< .mine
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using CommonUtils;
+using DevExpress.XtraEditors;
+
+namespace UIRenderers
+{
+    public partial class mainForm : XtraForm
+    {
+        internal Dictionary<string , Control> ContextControls = new Dictionary<string , Control>( );
+        internal Dictionary<string, Control> ContextControlsForInsumo = new Dictionary<string, Control>();
+        internal Dictionary<string, Control> ContextControlsForRecetas = new Dictionary<string, Control>();
+        internal Dictionary<string, Control> ContextControlsForProductos = new Dictionary<string, Control>();
+        internal Dictionary<string, Control> ContextControlsForPrivilegios = new Dictionary<string, Control>();
+      
+        //internal Dictionary<string, Control> ContextControlsFor = new Dictionary<string, Control>();
+
+        public Usuarios UsActual { get; set; }
+
+        #region Init UI
+        public mainForm( )
+        {
+            InitializeComponent( );
+            InitUI( );
+            InitPrivilegios( );
+        }
+
+        private void InitPrivilegios( )
+        {
+            //for productos
+            if ( !CommonUtils.Parser.ShowProductos )
+                Inventario.Visible = false;
+
+            //for insumos
+            if ( !CommonUtils.Parser.ShowInsumos )
+                Insumo.Visible = false;
+
+            //for ingresos,egresos inventario 
+            if (!CommonUtils.Parser.ShowCompraInsumos)
+                navBarItemCompras.Visible = false;//navBarGroupComprasIventario.Visible = false;
+            if (!CommonUtils.Parser.ShowInventarioInsumos)
+                navBarItemInventario.Visible = false;
+
+            //for recetas
+            if ( !CommonUtils.Parser.ShowRecetas )
+                navBarGroupRecipe.Visible = false;
+
+            //for caja
+            if (!CommonUtils.Parser.ShowCaja)
+                navBarItemCaja.Visible = false;  //navBarGroupCaja.Visible = false;
+
+            if (!CommonUtils.Parser.ShowIngresosEgresos)
+                navBarItemEgresosIngresos.Visible = false;
+
+            //for ventas
+            if ( !CommonUtils.Parser.ShowVentasReservar )
+                navBarGroupVentas.Visible = false;
+
+            //for reports
+            if ( !CommonUtils.Parser.ShowReportesVentas )//for reports ventas
+                navBarItemVentaDeproductos.Visible=false;            // navBarGroupReport.Visible = false;
+            if (!CommonUtils.Parser.ShowReportesComprasEspeciales)
+                navBarItemReportComprasEspeciales.Visible = false;
+            if (!CommonUtils.Parser.ShowReportesComprasInsumos)
+                navBarItemReporteComprasInsumos.Visible = false;
+            if (!CommonUtils.Parser.ShowReportesFactura)
+                navBarItemFacturas.Visible = false;
+           
+
+            //for privilegios
+            if ( !CommonUtils.Parser.ShowPrivilegios )
+                navBarGroupPrivilegios.Visible = false;
+        }
+
+        private void InitUI()
+        {
+            InitCajaForm( );
+            InitDosificacion( );
+            InitDatosEmpresa( );          
+        }
+
+        private static void InitCajaForm( )
+        {
+            CommonUtils.ConexionBD.StringDeConexion = CommonUtils.ConexionBD.GetConnectionString( );
+
+            string sqlQuery = "Select * FROM dosificacion WHERE (dosificacion_id = (SELECT  MAX(dosificacion_id)  FROM dosificacion))";
+            DataTable factura = CommonUtils.ConexionBD.EjecutarConsulta( sqlQuery );
+            int rows = factura.Rows.Count;
+            
+            if ( rows == 0 )
+            {
+                Dosificacion dosificacion = new Dosificacion( );
+                dosificacion.ShowDialog( );
+                dosificacion.Refresh( );
+            }
+
+            CommonUtils.ConexionBD.CerrarConexion( );
+        }
+
+        private void InitDosificacion( )
+        {
+            CommonUtils.ConexionBD.StringDeConexion = CommonUtils.ConexionBD.GetConnectionString( );
+            string sqlQuery = "Select * FROM Caja WHERE (CajaId = (SELECT  MAX(CajaId)  FROM Caja))";
+            DataTable tableTemp = CommonUtils.ConexionBD.EjecutarConsulta( sqlQuery );
+            int rows = tableTemp.Rows.Count;
+            if ( rows == 0 )
+            {
+                InitCajaForm cajaform = new InitCajaForm( );
+                cajaform.ShowDialog( );
+                cajaform.Refresh( );
+            }
+
+            CommonUtils.ConexionBD.CerrarConexion( );
+        }
+
+        private void InitDatosEmpresa( )
+        {
+            CommonUtils.ConexionBD.StringDeConexion = CommonUtils.ConexionBD.GetConnectionString( );
+            string sqlQuery = "Select * FROM Telecentro";
+            DataTable tableTemp = CommonUtils.ConexionBD.EjecutarConsulta( sqlQuery );
+            int rows = tableTemp.Rows.Count;
+            
+            if ( rows == 0 )
+            {
+                DatosEmpresa pnlInformacion = new DatosEmpresa( );
+                pnlInformacion.ShowDialog( );
+                pnlInformacion.Refresh( );
+            }
+
+            CommonUtils.ConexionBD.CerrarConexion( );
+        }
+        #endregion
+
+        #region Methods
+
+        private void InicializarDosificaciones( )
+        {
+            Dosificacion pnlDosificacion = new Dosificacion( );
+            pnlDosificacion.ShowDialog( );
+            pnlDosificacion.Refresh( );
+        }
+
+        private void InicializarDatosEmpresa( )
+        {
+            CommonUtils.ConexionBD.StringDeConexion = CommonUtils.ConexionBD.GetConnectionString( );
+            string sqlQuery = "Select * FROM Telecentro";
+
+            DataTable tableTemp = CommonUtils.ConexionBD.EjecutarConsulta( sqlQuery );
+            int rows = tableTemp.Rows.Count;
+            
+            if ( rows == 0 )
+            {
+                DatosEmpresa pnlInformacion = new DatosEmpresa( );
+                pnlInformacion.ShowDialog( );
+                pnlInformacion.Refresh( );
+            }
+            else
+            {
+                CommonUtils.Empresa empresa = new CommonUtils.Empresa( );
+
+                empresa.Direccion = ( string ) tableTemp.Rows[ 0 ].ItemArray[ 3 ];
+                empresa.NIT = Convert.ToString( tableTemp.Rows[ 0 ].ItemArray[ 4 ] );
+                empresa.NombreEmpresa = Convert.ToString( tableTemp.Rows[ 0 ].ItemArray[ 2 ] );
+                empresa.RazonSocial = Convert.ToString( tableTemp.Rows[ 0 ].ItemArray[ 1 ] );
+                empresa.SucursalNro = Convert.ToInt32( tableTemp.Rows[ 0 ].ItemArray[ 5 ] );
+                empresa.Telefono = Convert.ToString( tableTemp.Rows[ 0 ].ItemArray[ 6 ] );
+
+                DatosEmpresa formEmpresa = new DatosEmpresa( empresa );
+                formEmpresa.ShowDialog( );
+                formEmpresa.Refresh( );
+            }
+
+            CommonUtils.ConexionBD.CerrarConexion( );
+        }
+
+        private void InicializarPrivilegios()
+        {
+            if (!ContextControls.ContainsKey("PnlNuevoPrivilegio"))
+            {
+                PnlNuevoPrivilegio pnlNuevoPrivilegio = new PnlNuevoPrivilegio();
+                pnlNuevoPrivilegio.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+                tabItem.Controls.Add(pnlNuevoPrivilegio);
+                tabItem.Text = "Lista de Privilegios";
+                xtraTabControl.TabPages.Add(tabItem);
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add("PnlNuevoPrivilegio", pnlNuevoPrivilegio);
+            } 
+        }
+
+        private void InicializarInventario()
+        {
+            if (!ContextControls.ContainsKey("PnlInventario"))
+            {
+                PnlInventario pnlInventario = new PnlInventario();
+                pnlInventario.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+                tabItem.Controls.Add(pnlInventario);
+                tabItem.Text = "Control de inventario";
+                xtraTabControl.TabPages.Add(tabItem);
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add("PnlInventario", pnlInventario);
+            }
+ 
+        }
+
+        #region reportes
+
+        private void InicializarReportesComprasInsumosConFecha()
+        {
+            if (!ContextControls.ContainsKey("ReporteVentasPorFecha"))
+            {
+                ReporteVentasPorFecha pnlReportesFecha = new ReporteVentasPorFecha();
+                pnlReportesFecha.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+                tabItem.Controls.Add(pnlReportesFecha);
+                tabItem.Text = "Reporte Compras con fecha";
+                xtraTabControl.TabPages.Add(tabItem);
+                xtraTabControl.SelectedTabPage = tabItem;
+                ContextControls.Add("ReporteVentasPorFecha", pnlReportesFecha);
+            }
+        }
+
+        private void InicializarReporteComprasEspeciales() 
+        {
+            if (!ContextControls.ContainsKey("ReportesComprasEspeciales"))
+            {
+                ReportesComprasEspeciales pnlRprtComprasEspeciales = new ReportesComprasEspeciales();
+                pnlRprtComprasEspeciales.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+                tabItem.Controls.Add(pnlRprtComprasEspeciales);
+                tabItem.Text = "Reporte Compras Especiales";
+                xtraTabControl.TabPages.Add(tabItem);
+                xtraTabControl.SelectedTabPage = tabItem;
+                ContextControls.Add("ReportesComprasEspeciales", pnlRprtComprasEspeciales);
+            }
+        }
+
+        private void InicializarReporteVentas()
+        {
+            if (!ContextControls.ContainsKey("ReportesVentas"))
+            {
+                ReportesVentas pnlReportesVentas = new ReportesVentas();
+                pnlReportesVentas.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+                tabItem.Controls.Add(pnlReportesVentas);
+                tabItem.Text = "Reporte Ventas";
+                xtraTabControl.TabPages.Add(tabItem);
+                xtraTabControl.SelectedTabPage = tabItem;
+                ContextControls.Add("ReportesVentas", pnlReportesVentas);
+            }
+        }
+
+        private void InicializarReporteComprasDeInsumos() 
+        {
+            if (!ContextControls.ContainsKey("ReportesComprasInsumos"))
+            {
+                ReportesComprasInsumos pnlReportesComprasInsumos = new ReportesComprasInsumos();
+                pnlReportesComprasInsumos.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+                tabItem.Controls.Add(pnlReportesComprasInsumos);
+                tabItem.Text = "Reporte Compras de Insumos";
+                xtraTabControl.TabPages.Add(tabItem);
+                xtraTabControl.SelectedTabPage = tabItem;
+                ContextControls.Add("ReportesComprasInsumos", pnlReportesComprasInsumos);
+            }
+        }
+
+        private void InicializarReportesFacturas()
+        {
+            if (!ContextControls.ContainsKey("ReporteFacturas"))
+            {
+                ReporteFacturas pnlReportesFacturas = new ReporteFacturas();
+                pnlReportesFacturas.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+                tabItem.Controls.Add(pnlReportesFacturas);
+                tabItem.Text = "Reporte Facturas";
+                xtraTabControl.TabPages.Add(tabItem);
+                xtraTabControl.SelectedTabPage = tabItem;
+                ContextControls.Add("ReporteFacturas", pnlReportesFacturas);
+            }
+             
+        }
+
+        #endregion
+
+        internal void InicializarNuevoProducto( )
+        {
+            if ( !ContextControls.ContainsKey( "PnlNuevoProducto" ) )
+            {
+                PnlNuevoProducto pnlProducto = new PnlNuevoProducto( );
+                pnlProducto.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( pnlProducto );
+                tabItem.Text = "Nuevo Producto";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlNuevoProducto" , pnlProducto );
+            }
+        }
+
+        internal void InicializarNuevoInsumo()
+        {
+           /* NuevoInsumo pnlInsumo = new NuevoInsumo();
+            pnlInsumo.Dock = DockStyle.Fill;
+            DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+            tabItem.Controls.Add(pnlInsumo);
+            tabItem.Text = "Nuevo Insumo";
+            xtraTabControl.TabPages.Add(tabItem);
+            xtraTabControl.SelectedTabPage = tabItem;
+            statusStrip.BackColor = Color.LightSkyBlue;*/
+
+            if ( !ContextControls.ContainsKey( "PnlListaInsumos" ) )
+            {
+                PnlListaInsumos pnlInsumo = new PnlListaInsumos( );
+                pnlInsumo.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( pnlInsumo );
+                tabItem.Text = "Lista Insumos";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlListaInsumos" , pnlInsumo );
+            }
+        }
+
+        private void InicializarNuevaReceta( )
+        {
+           /* PnlNuevaReceta pnlReceta = new PnlNuevaReceta( );
+            pnlReceta.Dock = DockStyle.Fill;
+            DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+            tabItem.Controls.Add( pnlReceta );
+            tabItem.Text = "Nueva Receta";
+            xtraTabControl.TabPages.Add( tabItem );
+            xtraTabControl.SelectedTabPage = tabItem;
+            statusStrip.BackColor = Color.LightSkyBlue;*/
+            if ( !ContextControls.ContainsKey( "PnlListaRecetas" ) )
+            {
+                PnlListaRecetas pnlReceta = new PnlListaRecetas( );
+                pnlReceta.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( pnlReceta );
+                tabItem.Text = "Lista Recetas";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlListaRecetas" , pnlReceta );
+            }
+        }
+
+        private void InicializarCaja()
+        {
+            if ( !ContextControls.ContainsKey( "ManejadorCaja" ) )
+            {
+                ManejadorCaja caja = new ManejadorCaja( );
+                caja.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( caja );
+                tabItem.Text = "Caja";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "ManejadorCaja" , caja );
+            }
+        }
+
+        private void InicializarIngresosEgresos()
+        {
+            if ( !ContextControls.ContainsKey( "EgresosIngresos" ) )
+            {
+                EgresosIngresos pnlEgresosIngresos = new EgresosIngresos( );
+                pnlEgresosIngresos.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( pnlEgresosIngresos );
+                tabItem.Text = "Ingresos/Egresos";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "EgresosIngresos" , pnlEgresosIngresos );
+            }
+        }
+
+        private void InicializarVentas()
+        {
+            if ( !ContextControls.ContainsKey( "PnlVentas" ) )
+            {
+                PnlVentas pnlListaProductos = new PnlVentas( );
+                pnlListaProductos.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( pnlListaProductos );
+                tabItem.Text = "Venta de productos";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlVentas" , pnlListaProductos );
+            }
+        }
+
+        private void InicializarReservas()
+        {
+            if ( !ContextControls.ContainsKey( "PnlListaReservas" ) )
+            {
+                PnlListaReservas pnlListaReservas = new PnlListaReservas( );
+                pnlListaReservas.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( pnlListaReservas );
+                tabItem.Text = "Reservas";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlListaReservas" , pnlListaReservas );
+            }
+        }
+
+        private void ListarProductos( )
+        {
+            if ( !ContextControls.ContainsKey( "PnlListaProductos" ) )
+            {
+                PnlListaProductos pnlListaProductos = new PnlListaProductos( );
+                pnlListaProductos.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( pnlListaProductos );
+                tabItem.Text = "Lista de productos";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlListaProductos" , pnlListaProductos );
+            }
+        }
+
+        private void ListarCompras()
+        {
+            if ( !ContextControls.ContainsKey( "PnlListaComprasInsumos" ) )
+            {
+                PnlListaComprasInsumos comprar = new PnlListaComprasInsumos( );
+                comprar.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( comprar );
+                tabItem.Text = "Lista Compras";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlListaComprasInsumos" , comprar );
+            }
+        }
+
+        private void InicializarEstadisticas( )
+        {
+            if ( !ContextControls.ContainsKey( "EstadisticasProductos" ) )
+            {
+                EstadisticasProductos chartEstadisticas = new EstadisticasProductos( );
+                chartEstadisticas.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( chartEstadisticas );
+                tabItem.Text = "Productos por Tipo";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "EstadisticasProductos" , chartEstadisticas );
+            }
+        }
+
+        private void InicializarListaUsuarios( )
+        {
+            if ( !ContextControls.ContainsKey( "PnlListaUsuarios" ) )
+            {
+                PnlListaUsuarios usuarios = new PnlListaUsuarios( );
+                usuarios.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( usuarios );
+                tabItem.Text = "Usuarios del sistema";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlListaUsuarios" , usuarios );
+            }
+        }
+
+        #endregion
+
+        #region Events & Handlers
+        private void navBarNuevoProducto_LinkClicked( object sender , DevExpress.XtraNavBar.NavBarLinkEventArgs e )
+        {
+            InicializarNuevoProducto( );
+        }
+
+        private void xtraTabControl_CloseButtonClick( object sender , EventArgs e )
+        {
+            string nameTab = (sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Text;
+            if (nameTab == "Ingresos/Egresos")
+            {
+               EgresosIngresos egresosIngresos=(EgresosIngresos)(sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0];
+               if (egresosIngresos.DataHasChanged)
+               {
+                   if (MessageBox.Show(this, "Existen cambios en la tabla, desea salir sin guardar los cambios? ", "Ingresos/Egresos", MessageBoxButtons.YesNo) == DialogResult.No)
+                   {
+                       return;
+                   }
+               }
+            }
+            else if (nameTab == "Lista Compras")
+            {
+                PnlListaComprasInsumos pnlComprasInsumoes = (PnlListaComprasInsumos)(sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0];
+                if (pnlComprasInsumoes.DataHasChanged)
+                {
+                    if (MessageBox.Show(this, "Existen cambios en la tabla, desea salir sin guardar los cambios? ", "Lista Compras", MessageBoxButtons.YesNo) == DialogResult.No)
+                    {
+                        return;
+                    }
+                }
+            }
+            else if (nameTab == "Control de inventario")
+            {
+                PnlInventario invent = (PnlInventario)(sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0];
+                if (invent.DataHasChanged)
+                {
+                    if (MessageBox.Show(this, "Existen cambios en la tabla, desea salir sin guardar los cambios? ", "Control de Inventario", MessageBoxButtons.YesNo) == DialogResult.No)
+                    {
+                        return;
+                    } 
+                }
+            }
+           // else if(nameTab=="")
+
+            //editar insumos
+            if (ContextControlsForInsumo.ContainsValue((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0]))
+            {
+                ContextControlsForInsumo.Remove(((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0] as NuevoInsumo).Insumo.idInsumo.ToString());//((NuevoInsumo)((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0]));
+            }
+            //editar recetas
+            if (ContextControlsForRecetas.ContainsValue((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0]))
+            {
+                ContextControlsForRecetas.Remove(((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0] as PnlNuevaReceta).Receta.idReceta.ToString());//((NuevoInsumo)((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0]));
+            }
+            
+            //editar productos
+            if (ContextControlsForProductos.ContainsValue((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0]))
+            {
+                ContextControlsForProductos.Remove(((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0] as PnlNuevoProducto).Producto.ProductoID.ToString());
+            }
+
+            //editar privilegios
+            if (ContextControlsForPrivilegios.ContainsValue((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0]))
+            {
+                ContextControlsForPrivilegios.Remove(((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0] as PnlNuevoPrivilegio).IDUsuario);
+            }
+
+
+
+            if ( ContextControls.ContainsValue( ( sender as DevExpress.XtraTab.XtraTabControl ).SelectedTabPage.Controls[ 0 ] ) )            
+                ContextControls.Remove( ( sender as DevExpress.XtraTab.XtraTabControl ).SelectedTabPage.Controls[ 0 ].Name );
+        
+
+            if ( ( sender as DevExpress.XtraTab.XtraTabControl ).SelectedTabPageIndex != 0 )
+                xtraTabControl.TabPages.RemoveAt( ( sender as DevExpress.XtraTab.XtraTabControl ).SelectedTabPageIndex );
+        }
+
+        private void LnkInvTitle_LinkClicked( object sender , LinkLabelLinkClickedEventArgs e )
+        {
+            InicializarNuevoProducto( );
+        }
+
+        private void navBarNuevoInsumo_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarNuevoInsumo();
+        }
+        
+        private void navBarListaProductos_LinkClicked( object sender , DevExpress.XtraNavBar.NavBarLinkEventArgs e )
+        {
+            ListarProductos( );
+        }
+
+        private void navBarItemCompras_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            ListarCompras();
+        }
+
+        private void navBarItemRecetas_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarNuevaReceta();
+        }
+        #endregion
+
+        private void navBarItemCaja_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarCaja();
+        }
+
+        private void navBarItemEgresosIngresos_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarIngresosEgresos();
+        }
+
+              
+        private void navBarItemEstadisticas_LinkClicked( object sender , DevExpress.XtraNavBar.NavBarLinkEventArgs e )
+        {
+            InicializarEstadisticas( );
+        }
+
+        private void navBarItemReportesVentas_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            
+        }
+
+        private void navBarItem2_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarVentas();
+        }
+
+        private void navBarItemReservando_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarReservas();
+        }
+
+        private void navBarItemInventario_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarInventario();
+        }
+
+        private void navBarItemVentaDeproductos_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarReporteVentas();
+        }
+
+        private void navBarItemReporteComprasInsumos_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarReporteComprasDeInsumos();
+        }
+
+        private void navBarItemReportComprasEspeciales_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarReporteComprasEspeciales();
+        }
+
+        private void navBarItemPrivilegiosUsers_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarPrivilegios();
+        }
+
+        private void navBarItemUsuarios_LinkClicked( object sender , DevExpress.XtraNavBar.NavBarLinkEventArgs e )
+        {
+            InicializarListaUsuarios( );
+        }
+
+        private void mainForm_FormClosed( object sender , FormClosedEventArgs e )
+        {
+            Application.Exit( );
+            Dispose( );
+        }
+
+        private void navBarItemDosificacion_LinkClicked( object sender , DevExpress.XtraNavBar.NavBarLinkEventArgs e )
+        {
+            InicializarDosificaciones();
+        }
+
+        private void navBarItemFacturas_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarReportesFacturas();
+        }
+
+        private void navBarItemDatosEmpresa_LinkClicked( object sender , DevExpress.XtraNavBar.NavBarLinkEventArgs e )
+        {
+            InicializarDatosEmpresa( );
+        }
+
+        private void navBarItemReporteComprasConFecha_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarReportesComprasInsumosConFecha();
+        }    
+    }
+}
+=======
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using CommonUtils;
+using DevExpress.XtraEditors;
+
+namespace UIRenderers
+{
+    public partial class mainForm : XtraForm
+    {
+        internal Dictionary<string , Control> ContextControls = new Dictionary<string , Control>( );
+        internal Dictionary<string, Control> ContextControlsForInsumo = new Dictionary<string, Control>();
+        internal Dictionary<string, Control> ContextControlsForRecetas = new Dictionary<string, Control>();
+        internal Dictionary<string, Control> ContextControlsForProductos = new Dictionary<string, Control>();
+        internal Dictionary<string, Control> ContextControlsForPrivilegios = new Dictionary<string, Control>();
+      
+        //internal Dictionary<string, Control> ContextControlsFor = new Dictionary<string, Control>();
+
+        public Usuarios UsActual { get; set; }
+
+        #region Init UI
+        public mainForm( )
+        {
+            InitializeComponent( );
+            InitUI( );
+            InitPrivilegios( );
+        }
+
+        private void InitPrivilegios( )
+        {
+            //for productos
+            if ( !CommonUtils.Parser.ShowProductos )
+                Inventario.Visible = false;
+
+            //for insumos
+            if ( !CommonUtils.Parser.ShowInsumos )
+                Insumo.Visible = false;
+
+            //for ingresos,egresos inventario 
+            if (!CommonUtils.Parser.ShowCompraInsumos)
+                navBarItemCompras.Visible = false;//navBarGroupComprasIventario.Visible = false;
+            if (!CommonUtils.Parser.ShowInventarioInsumos)
+                navBarItemInventario.Visible = false;
+
+            //for recetas
+            if ( !CommonUtils.Parser.ShowRecetas )
+                navBarGroupRecipe.Visible = false;
+
+            //for caja
+            if (!CommonUtils.Parser.ShowCaja)
+                navBarItemCaja.Visible = false;  //navBarGroupCaja.Visible = false;
+
+            if (!CommonUtils.Parser.ShowIngresosEgresos)
+                navBarItemEgresosIngresos.Visible = false;
+
+            //for ventas
+            if ( !CommonUtils.Parser.ShowVentasReservar )
+                navBarGroupVentas.Visible = false;
+
+            //for reports
+            if ( !CommonUtils.Parser.ShowReportesVentas )//for reports ventas
+                navBarItemVentaDeproductos.Visible=false;            // navBarGroupReport.Visible = false;
+            if (!CommonUtils.Parser.ShowReportesComprasEspeciales)
+                navBarItemReportComprasEspeciales.Visible = false;
+            if (!CommonUtils.Parser.ShowReportesComprasInsumos)
+                navBarItemReporteComprasInsumos.Visible = false;
+            if (!CommonUtils.Parser.ShowReportesFactura)
+                navBarItemFacturas.Visible = false;
+           
+
+            //for privilegios
+            if ( !CommonUtils.Parser.ShowPrivilegios )
+                navBarGroupPrivilegios.Visible = false;
+        }
+
+        private void InitUI()
+        {
+            InitCajaForm( );
+            InitDosificacion( );
+            InitDatosEmpresa( );          
+        }
+
+        private static void InitCajaForm( )
+        {
+            CommonUtils.ConexionBD.StringDeConexion = CommonUtils.ConexionBD.GetConnectionString( );
+
+            string sqlQuery = "Select * FROM dosificacion WHERE (dosificacion_id = (SELECT  MAX(dosificacion_id)  FROM dosificacion))";
+            DataTable factura = CommonUtils.ConexionBD.EjecutarConsulta( sqlQuery );
+            int rows = factura.Rows.Count;
+            
+            if ( rows == 0 )
+            {
+                Dosificacion dosificacion = new Dosificacion( );
+                dosificacion.ShowDialog( );
+                dosificacion.Refresh( );
+            }
+
+            CommonUtils.ConexionBD.CerrarConexion( );
+        }
+
+        private void InitDosificacion( )
+        {
+            CommonUtils.ConexionBD.StringDeConexion = CommonUtils.ConexionBD.GetConnectionString( );
+            string sqlQuery = "Select * FROM Caja WHERE (CajaId = (SELECT  MAX(CajaId)  FROM Caja))";
+            DataTable tableTemp = CommonUtils.ConexionBD.EjecutarConsulta( sqlQuery );
+            int rows = tableTemp.Rows.Count;
+            if ( rows == 0 )
+            {
+                InitCajaForm cajaform = new InitCajaForm( );
+                cajaform.ShowDialog( );
+                cajaform.Refresh( );
+            }
+
+            CommonUtils.ConexionBD.CerrarConexion( );
+        }
+
+        private void InitDatosEmpresa( )
+        {
+            CommonUtils.ConexionBD.StringDeConexion = CommonUtils.ConexionBD.GetConnectionString( );
+            string sqlQuery = "Select * FROM Telecentro";
+            DataTable tableTemp = CommonUtils.ConexionBD.EjecutarConsulta( sqlQuery );
+            int rows = tableTemp.Rows.Count;
+            
+            if ( rows == 0 )
+            {
+                DatosEmpresa pnlInformacion = new DatosEmpresa( );
+                pnlInformacion.ShowDialog( );
+                pnlInformacion.Refresh( );
+            }
+
+            CommonUtils.ConexionBD.CerrarConexion( );
+        }
+        #endregion
+
+        #region Methods
+
+        private void InicializarDosificaciones( )
+        {
+            Dosificacion pnlDosificacion = new Dosificacion( );
+            pnlDosificacion.ShowDialog( );
+            pnlDosificacion.Refresh( );
+        }
+
+        private void InicializarDatosEmpresa( )
+        {
+            CommonUtils.ConexionBD.StringDeConexion = CommonUtils.ConexionBD.GetConnectionString( );
+            string sqlQuery = "Select * FROM Telecentro";
+
+            DataTable tableTemp = CommonUtils.ConexionBD.EjecutarConsulta( sqlQuery );
+            int rows = tableTemp.Rows.Count;
+            
+            if ( rows == 0 )
+            {
+                DatosEmpresa pnlInformacion = new DatosEmpresa( );
+                pnlInformacion.ShowDialog( );
+                pnlInformacion.Refresh( );
+            }
+            else
+            {
+                CommonUtils.Empresa empresa = new CommonUtils.Empresa( );
+
+                empresa.Direccion = ( string ) tableTemp.Rows[ 0 ].ItemArray[ 3 ];
+                empresa.NIT = Convert.ToString( tableTemp.Rows[ 0 ].ItemArray[ 4 ] );
+                empresa.NombreEmpresa = Convert.ToString( tableTemp.Rows[ 0 ].ItemArray[ 2 ] );
+                empresa.RazonSocial = Convert.ToString( tableTemp.Rows[ 0 ].ItemArray[ 1 ] );
+                empresa.SucursalNro = Convert.ToInt32( tableTemp.Rows[ 0 ].ItemArray[ 5 ] );
+                empresa.Telefono = Convert.ToString( tableTemp.Rows[ 0 ].ItemArray[ 6 ] );
+
+                DatosEmpresa formEmpresa = new DatosEmpresa( empresa );
+                formEmpresa.ShowDialog( );
+                formEmpresa.Refresh( );
+            }
+
+            CommonUtils.ConexionBD.CerrarConexion( );
+        }
+
+        private void InicializarPrivilegios()
+        {
+            if (!ContextControls.ContainsKey("PnlNuevoPrivilegio"))
+            {
+                PnlNuevoPrivilegio pnlNuevoPrivilegio = new PnlNuevoPrivilegio();
+                pnlNuevoPrivilegio.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+                tabItem.Controls.Add(pnlNuevoPrivilegio);
+                tabItem.Text = "Lista de Privilegios";
+                xtraTabControl.TabPages.Add(tabItem);
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add("PnlNuevoPrivilegio", pnlNuevoPrivilegio);
+            } 
+        }
+
+        private void InicializarInventario()
+        {
+            if (!ContextControls.ContainsKey("PnlInventario"))
+            {
+                PnlInventario pnlInventario = new PnlInventario();
+                pnlInventario.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+                tabItem.Controls.Add(pnlInventario);
+                tabItem.Text = "Control de inventario";
+                xtraTabControl.TabPages.Add(tabItem);
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add("PnlInventario", pnlInventario);
+            }
+ 
+        }
+
+        #region reportes
+
+        private void InicializarReporteComprasEspeciales() 
+        {
+            if (!ContextControls.ContainsKey("ReportesComprasEspeciales"))
+            {
+                ReportesComprasEspeciales pnlRprtComprasEspeciales = new ReportesComprasEspeciales();
+                pnlRprtComprasEspeciales.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+                tabItem.Controls.Add(pnlRprtComprasEspeciales);
+                tabItem.Text = "Reporte Compras Especiales";
+                xtraTabControl.TabPages.Add(tabItem);
+                xtraTabControl.SelectedTabPage = tabItem;
+                ContextControls.Add("ReportesComprasEspeciales", pnlRprtComprasEspeciales);
+            }
+        }
+
+        private void InicializarReporteVentas()
+        {
+            if (!ContextControls.ContainsKey("ReportesVentas"))
+            {
+                ReportesVentas pnlReportesVentas = new ReportesVentas();
+                pnlReportesVentas.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+                tabItem.Controls.Add(pnlReportesVentas);
+                tabItem.Text = "Reporte Ventas";
+                xtraTabControl.TabPages.Add(tabItem);
+                xtraTabControl.SelectedTabPage = tabItem;
+                ContextControls.Add("ReportesVentas", pnlReportesVentas);
+            }
+        }
+
+        private void InicializarReporteComprasDeInsumos() 
+        {
+            if (!ContextControls.ContainsKey("ReportesComprasInsumos"))
+            {
+                ReportesComprasInsumos pnlReportesComprasInsumos = new ReportesComprasInsumos();
+                pnlReportesComprasInsumos.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+                tabItem.Controls.Add(pnlReportesComprasInsumos);
+                tabItem.Text = "Reporte Compras de Insumos";
+                xtraTabControl.TabPages.Add(tabItem);
+                xtraTabControl.SelectedTabPage = tabItem;
+                ContextControls.Add("ReportesComprasInsumos", pnlReportesComprasInsumos);
+            }
+        }
+
+        private void InicializarReportesFacturas()
+        {
+            if (!ContextControls.ContainsKey("ReporteFacturas"))
+            {
+                ReporteFacturas pnlReportesFacturas = new ReporteFacturas();
+                pnlReportesFacturas.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+                tabItem.Controls.Add(pnlReportesFacturas);
+                tabItem.Text = "Reporte Facturas";
+                xtraTabControl.TabPages.Add(tabItem);
+                xtraTabControl.SelectedTabPage = tabItem;
+                ContextControls.Add("ReporteFacturas", pnlReportesFacturas);
+            }
+             
+        }
+
+        #endregion
+
+        internal void InicializarNuevoProducto( )
+        {
+            if ( !ContextControls.ContainsKey( "PnlNuevoProducto" ) )
+            {
+                PnlNuevoProducto pnlProducto = new PnlNuevoProducto( );
+                pnlProducto.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( pnlProducto );
+                tabItem.Text = "Nuevo Producto";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlNuevoProducto" , pnlProducto );
+            }
+        }
+
+        internal void InicializarNuevoInsumo()
+        {
+           /* NuevoInsumo pnlInsumo = new NuevoInsumo();
+            pnlInsumo.Dock = DockStyle.Fill;
+            DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage();
+            tabItem.Controls.Add(pnlInsumo);
+            tabItem.Text = "Nuevo Insumo";
+            xtraTabControl.TabPages.Add(tabItem);
+            xtraTabControl.SelectedTabPage = tabItem;
+            statusStrip.BackColor = Color.LightSkyBlue;*/
+
+            if ( !ContextControls.ContainsKey( "PnlListaInsumos" ) )
+            {
+                PnlListaInsumos pnlInsumo = new PnlListaInsumos( );
+                pnlInsumo.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( pnlInsumo );
+                tabItem.Text = "Lista Insumos";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlListaInsumos" , pnlInsumo );
+            }
+        }
+
+        private void InicializarNuevaReceta( )
+        {
+           /* PnlNuevaReceta pnlReceta = new PnlNuevaReceta( );
+            pnlReceta.Dock = DockStyle.Fill;
+            DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+            tabItem.Controls.Add( pnlReceta );
+            tabItem.Text = "Nueva Receta";
+            xtraTabControl.TabPages.Add( tabItem );
+            xtraTabControl.SelectedTabPage = tabItem;
+            statusStrip.BackColor = Color.LightSkyBlue;*/
+            if ( !ContextControls.ContainsKey( "PnlListaRecetas" ) )
+            {
+                PnlListaRecetas pnlReceta = new PnlListaRecetas( );
+                pnlReceta.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( pnlReceta );
+                tabItem.Text = "Lista Recetas";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlListaRecetas" , pnlReceta );
+            }
+        }
+
+        private void InicializarCaja()
+        {
+            if ( !ContextControls.ContainsKey( "ManejadorCaja" ) )
+            {
+                ManejadorCaja caja = new ManejadorCaja( );
+                caja.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( caja );
+                tabItem.Text = "Caja";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "ManejadorCaja" , caja );
+            }
+        }
+
+        private void InicializarIngresosEgresos()
+        {
+            if ( !ContextControls.ContainsKey( "EgresosIngresos" ) )
+            {
+                EgresosIngresos pnlEgresosIngresos = new EgresosIngresos( );
+                pnlEgresosIngresos.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( pnlEgresosIngresos );
+                tabItem.Text = "Ingresos/Egresos";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "EgresosIngresos" , pnlEgresosIngresos );
+            }
+        }
+
+        private void InicializarVentas()
+        {
+            if ( !ContextControls.ContainsKey( "PnlVentas" ) )
+            {
+                PnlVentas pnlListaProductos = new PnlVentas( );
+                pnlListaProductos.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( pnlListaProductos );
+                tabItem.Text = "Venta de productos";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlVentas" , pnlListaProductos );
+            }
+        }
+
+        private void InicializarReservas()
+        {
+            if ( !ContextControls.ContainsKey( "PnlListaReservas" ) )
+            {
+                PnlListaReservas pnlListaReservas = new PnlListaReservas( );
+                pnlListaReservas.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( pnlListaReservas );
+                tabItem.Text = "Reservas";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlListaReservas" , pnlListaReservas );
+            }
+        }
+
+        private void ListarProductos( )
+        {
+            if ( !ContextControls.ContainsKey( "PnlListaProductos" ) )
+            {
+                PnlListaProductos pnlListaProductos = new PnlListaProductos( );
+                pnlListaProductos.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( pnlListaProductos );
+                tabItem.Text = "Lista de productos";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlListaProductos" , pnlListaProductos );
+            }
+        }
+
+        private void ListarCompras()
+        {
+            if ( !ContextControls.ContainsKey( "PnlListaComprasInsumos" ) )
+            {
+                PnlListaComprasInsumos comprar = new PnlListaComprasInsumos( );
+                comprar.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( comprar );
+                tabItem.Text = "Lista Compras";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlListaComprasInsumos" , comprar );
+            }
+        }
+
+        private void InicializarEstadisticas( )
+        {
+            if ( !ContextControls.ContainsKey( "EstadisticasProductos" ) )
+            {
+                EstadisticasProductos chartEstadisticas = new EstadisticasProductos( );
+                chartEstadisticas.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( chartEstadisticas );
+                tabItem.Text = "Productos por Tipo";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "EstadisticasProductos" , chartEstadisticas );
+            }
+        }
+
+        private void InicializarListaUsuarios( )
+        {
+            if ( !ContextControls.ContainsKey( "PnlListaUsuarios" ) )
+            {
+                PnlListaUsuarios usuarios = new PnlListaUsuarios( );
+                usuarios.Dock = DockStyle.Fill;
+                DevExpress.XtraTab.XtraTabPage tabItem = new DevExpress.XtraTab.XtraTabPage( );
+                tabItem.Controls.Add( usuarios );
+                tabItem.Text = "Usuarios del sistema";
+                xtraTabControl.TabPages.Add( tabItem );
+                xtraTabControl.SelectedTabPage = tabItem;
+
+                ContextControls.Add( "PnlListaUsuarios" , usuarios );
+            }
+        }
+
+        #endregion
+
+        #region Events & Handlers
+        private void navBarNuevoProducto_LinkClicked( object sender , DevExpress.XtraNavBar.NavBarLinkEventArgs e )
+        {
+            InicializarNuevoProducto( );
+        }
+
+        private void xtraTabControl_CloseButtonClick( object sender , EventArgs e )
+        {
+            string nameTab = (sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Text;
+            if (nameTab == "Ingresos/Egresos")
+            {
+               EgresosIngresos egresosIngresos=(EgresosIngresos)(sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0];
+               if (egresosIngresos.DataHasChanged)
+               {
+                   if (MessageBox.Show(this, "Existen cambios en la tabla, desea salir sin guardar los cambios? ", "Ingresos/Egresos", MessageBoxButtons.YesNo) == DialogResult.No)
+                   {
+                       return;
+                   }
+               }
+            }
+            else if (nameTab == "Lista Compras")
+            {
+                PnlListaComprasInsumos pnlComprasInsumoes = (PnlListaComprasInsumos)(sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0];
+                if (pnlComprasInsumoes.DataHasChanged)
+                {
+                    if (MessageBox.Show(this, "Existen cambios en la tabla, desea salir sin guardar los cambios? ", "Lista Compras", MessageBoxButtons.YesNo) == DialogResult.No)
+                    {
+                        return;
+                    }
+                }
+            }
+            else if (nameTab == "Control de inventario")
+            {
+                PnlInventario invent = (PnlInventario)(sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0];
+                if (invent.DataHasChanged)
+                {
+                    if (MessageBox.Show(this, "Existen cambios en la tabla, desea salir sin guardar los cambios? ", "Control de Inventario", MessageBoxButtons.YesNo) == DialogResult.No)
+                    {
+                        return;
+                    } 
+                }
+            }
+           // else if(nameTab=="")
+
+            //editar insumos
+            if (ContextControlsForInsumo.ContainsValue((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0]))
+            {
+                ContextControlsForInsumo.Remove(((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0] as NuevoInsumo).Insumo.idInsumo.ToString());//((NuevoInsumo)((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0]));
+            }
+            //editar recetas
+            if (ContextControlsForRecetas.ContainsValue((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0]))
+            {
+                ContextControlsForRecetas.Remove(((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0] as PnlNuevaReceta).Receta.idReceta.ToString());//((NuevoInsumo)((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0]));
+            }
+            
+            //editar productos
+            if (ContextControlsForProductos.ContainsValue((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0]))
+            {
+                ContextControlsForProductos.Remove(((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0] as PnlNuevoProducto).Producto.ProductoID.ToString());
+            }
+
+            //editar privilegios
+            if (ContextControlsForPrivilegios.ContainsValue((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0]))
+            {
+                ContextControlsForPrivilegios.Remove(((sender as DevExpress.XtraTab.XtraTabControl).SelectedTabPage.Controls[0] as PnlNuevoPrivilegio).IDUsuario);
+            }
+
+
+
+            if ( ContextControls.ContainsValue( ( sender as DevExpress.XtraTab.XtraTabControl ).SelectedTabPage.Controls[ 0 ] ) )            
+                ContextControls.Remove( ( sender as DevExpress.XtraTab.XtraTabControl ).SelectedTabPage.Controls[ 0 ].Name );
+        
+
+            if ( ( sender as DevExpress.XtraTab.XtraTabControl ).SelectedTabPageIndex != 0 )
+                xtraTabControl.TabPages.RemoveAt( ( sender as DevExpress.XtraTab.XtraTabControl ).SelectedTabPageIndex );
+        }
+
+        private void LnkInvTitle_LinkClicked( object sender , LinkLabelLinkClickedEventArgs e )
+        {
+            InicializarNuevoProducto( );
+        }
+
+        private void navBarNuevoInsumo_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarNuevoInsumo();
+        }
+        
+        private void navBarListaProductos_LinkClicked( object sender , DevExpress.XtraNavBar.NavBarLinkEventArgs e )
+        {
+            ListarProductos( );
+        }
+
+        private void navBarItemCompras_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            ListarCompras();
+        }
+
+        private void navBarItemRecetas_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarNuevaReceta();
+        }
+        #endregion
+
+        private void navBarItemCaja_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarCaja();
+        }
+
+        private void navBarItemEgresosIngresos_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarIngresosEgresos();
+        }
+
+              
+        private void navBarItemEstadisticas_LinkClicked( object sender , DevExpress.XtraNavBar.NavBarLinkEventArgs e )
+        {
+            InicializarEstadisticas( );
+        }
+
+        private void navBarItemReportesVentas_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            
+        }
+
+        private void navBarItem2_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarVentas();
+        }
+
+        private void navBarItemReservando_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarReservas();
+        }
+
+        private void navBarItemInventario_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarInventario();
+        }
+
+        private void navBarItemVentaDeproductos_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarReporteVentas();
+        }
+
+        private void navBarItemReporteComprasInsumos_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarReporteComprasDeInsumos();
+        }
+
+        private void navBarItemReportComprasEspeciales_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarReporteComprasEspeciales();
+        }
+
+        private void navBarItemPrivilegiosUsers_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarPrivilegios();
+        }
+
+        private void navBarItemUsuarios_LinkClicked( object sender , DevExpress.XtraNavBar.NavBarLinkEventArgs e )
+        {
+            InicializarListaUsuarios( );
+        }
+
+        private void mainForm_FormClosed( object sender , FormClosedEventArgs e )
+        {
+            Application.Exit( );
+            Dispose( );
+        }
+
+        private void navBarItemDosificacion_LinkClicked( object sender , DevExpress.XtraNavBar.NavBarLinkEventArgs e )
+        {
+            InicializarDosificaciones();
+        }
+
+        private void navBarItemFacturas_LinkClicked(object sender, DevExpress.XtraNavBar.NavBarLinkEventArgs e)
+        {
+            InicializarReportesFacturas();
+        }
+
+        private void navBarItemDatosEmpresa_LinkClicked( object sender , DevExpress.XtraNavBar.NavBarLinkEventArgs e )
+        {
+            InicializarDatosEmpresa( );
+        }    
+    }
+}
+>>>>>>> .r368

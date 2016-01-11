@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iInventory", "iInventory.csproj", "{3C75F517-D0EB-4ACF-9F8A-E99F96333210}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonUtils", "..\..\iInventory\iInventory\CommonUtils\CommonUtils.csproj", "{70D88F2B-E286-475B-BF2B-143DE4EFD8CD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3C75F517-D0EB-4ACF-9F8A-E99F96333210}.Debug|x86.ActiveCfg = Debug|x86
+		{3C75F517-D0EB-4ACF-9F8A-E99F96333210}.Debug|x86.Build.0 = Debug|x86
+		{3C75F517-D0EB-4ACF-9F8A-E99F96333210}.Release|x86.ActiveCfg = Release|x86
+		{3C75F517-D0EB-4ACF-9F8A-E99F96333210}.Release|x86.Build.0 = Release|x86
+		{70D88F2B-E286-475B-BF2B-143DE4EFD8CD}.Debug|x86.ActiveCfg = Debug|x86
+		{70D88F2B-E286-475B-BF2B-143DE4EFD8CD}.Debug|x86.Build.0 = Debug|x86
+		{70D88F2B-E286-475B-BF2B-143DE4EFD8CD}.Release|x86.ActiveCfg = Release|x86
+		{70D88F2B-E286-475B-BF2B-143DE4EFD8CD}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
