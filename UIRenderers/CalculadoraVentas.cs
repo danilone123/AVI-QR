@@ -248,8 +248,8 @@ namespace UIRenderers
                 try
                 {
                     this.descontar();
-                   // this.guardarDineroEnCaja();
-                   // this.registrarPedidoInmediato();
+                    this.guardarDineroEnCaja();
+                    this.registrarPedidoInmediato();
                     if (this.isFacturaAvailable())
                     {
                         this.generateFactura();
@@ -358,72 +358,89 @@ namespace UIRenderers
         //categoria 5 es para combo
         private void descontar()
         {
-            
-            List<DataRow> listaCompras = dataTable.AsEnumerable().ToList();
-            string sql = string.Empty;
-            foreach(DataRow dtRow in listaCompras)
+            try
             {
-                string idProducto = dtRow["Id"].ToString();
-                sql = "Select CategoriaId from Producto where ProductoId=" + idProducto;
-                int categoriaId = int.Parse(CommonUtils.ConexionBD.EjecutarConsultaEspecial(sql));
-                if (categoriaId != 5)//no es combo
+                log.Error("CalculadoraVentas - Descontar");
+
+                List<DataRow> listaCompras = dataTable.AsEnumerable().ToList();
+                string sql = string.Empty;
+                foreach (DataRow dtRow in listaCompras)
                 {
-                    
-                    this.descontarUnProducto(idProducto, dtRow["Cantidad"].ToString());
-                  
-                }
-                else //es combo
-                {
-                   // CommonUtils.ConexionBD.AbrirConexion();
-                    sql = "(Select ProductoId,Cantidad from Producto_Producto where ComboId=" + dtRow["Id"]+")";
-                    CommonUtils.ConexionBD.AbrirConexion();
-                    DataTable reader = CommonUtils.ConexionBD.EjecutarConsulta(sql);
-                    CommonUtils.ConexionBD.CerrarConexion();
-                   for (int i = 0; i < reader.Rows.Count; i++)
-                   {
-                       string id = reader.Rows[i][0].ToString();
-                       
-                       this.descontarUnProducto(id, (float.Parse(reader.Rows[i][1].ToString())*float.Parse(dtRow["Cantidad"].ToString())).ToString());
-                   }
-                      
-                      /* {
-                           int idPro = (int)reader.GetDecimal(0);
-                           float cantidad = (float)reader.GetInt32(1) * );
+                    string idProducto = dtRow["Id"].ToString();
+                    sql = "Select CategoriaId from Producto where ProductoId=" + idProducto;
+                    int categoriaId = int.Parse(CommonUtils.ConexionBD.EjecutarConsultaEspecial(sql));
+                    if (categoriaId != 5)//no es combo
+                    {
+
+                        this.descontarUnProducto(idProducto, dtRow["Cantidad"].ToString());
+
+                    }
+                    else //es combo
+                    {
+                        // CommonUtils.ConexionBD.AbrirConexion();
+                        sql = "(Select ProductoId,Cantidad from Producto_Producto where ComboId=" + dtRow["Id"] + ")";
+                        CommonUtils.ConexionBD.AbrirConexion();
+                        DataTable reader = CommonUtils.ConexionBD.EjecutarConsulta(sql);
+                        CommonUtils.ConexionBD.CerrarConexion();
+                        for (int i = 0; i < reader.Rows.Count; i++)
+                        {
+                            string id = reader.Rows[i][0].ToString();
+
+                            this.descontarUnProducto(id, (float.Parse(reader.Rows[i][1].ToString()) * float.Parse(dtRow["Cantidad"].ToString())).ToString());
+                        }
+
+                        /* {
+                             int idPro = (int)reader.GetDecimal(0);
+                             float cantidad = (float)reader.GetInt32(1) * );
                          
-                       }*/
-                    
+                         }*/
+
+                    }
+                    /* sql = "SELECT Receta_Insumo.Cantidad, Receta_Insumo.InsumoId, Insumo.CantidadInsumoEnIventario, Insumo.Nombre FROM Receta_Insumo INNER JOIN Insumo ON Receta_Insumo.InsumoId = Insumo.InsumoId WHERE (Receta_Insumo.RecetaId = (SELECT RecetaId FROM Producto WHERE (ProductoId = "+idProducto+")))";
+                     //SqlCommand cmdInsumosReceta= new SqlCommand(sql, CommonUtils.ConexionBD.Conexion);
+                     DataTable temp = CommonUtils.ConexionBD.EjecutarConsulta(sql);
+                                 // DataSet dataSet = new DataSet();
+                    // dataSet.Load(cmdInsumosReceta.ExecuteReader(), LoadOption.OverwriteChanges, "InsumosReceta");
+                    // cmdInsumosReceta.Connection.Close();
+                     List<DataRow> insumosReceta = temp.AsEnumerable().ToList();// dataSet.Tables["InsumosReceta"].AsEnumerable().ToList();
+                     foreach (DataRow item in insumosReceta)
+                     {
+                         string cantidadNuevadeInsumo = (float.Parse(item[2].ToString())-(float.Parse(dtRow["Cantidad"].ToString()) * float.Parse(item[0].ToString()))).ToString();
+                         sql = "update Insumo set CantidadInsumoEnIventario="+cantidadNuevadeInsumo+" where InsumoId="+item[1].ToString();
+                         CommonUtils.ConexionBD.Actualizar(sql);
+                     }*/
                 }
-               /* sql = "SELECT Receta_Insumo.Cantidad, Receta_Insumo.InsumoId, Insumo.CantidadInsumoEnIventario, Insumo.Nombre FROM Receta_Insumo INNER JOIN Insumo ON Receta_Insumo.InsumoId = Insumo.InsumoId WHERE (Receta_Insumo.RecetaId = (SELECT RecetaId FROM Producto WHERE (ProductoId = "+idProducto+")))";
-                //SqlCommand cmdInsumosReceta= new SqlCommand(sql, CommonUtils.ConexionBD.Conexion);
-                DataTable temp = CommonUtils.ConexionBD.EjecutarConsulta(sql);
-                            // DataSet dataSet = new DataSet();
-               // dataSet.Load(cmdInsumosReceta.ExecuteReader(), LoadOption.OverwriteChanges, "InsumosReceta");
-               // cmdInsumosReceta.Connection.Close();
-                List<DataRow> insumosReceta = temp.AsEnumerable().ToList();// dataSet.Tables["InsumosReceta"].AsEnumerable().ToList();
-                foreach (DataRow item in insumosReceta)
-                {
-                    string cantidadNuevadeInsumo = (float.Parse(item[2].ToString())-(float.Parse(dtRow["Cantidad"].ToString()) * float.Parse(item[0].ToString()))).ToString();
-                    sql = "update Insumo set CantidadInsumoEnIventario="+cantidadNuevadeInsumo+" where InsumoId="+item[1].ToString();
-                    CommonUtils.ConexionBD.Actualizar(sql);
-                }*/
-            } 
+            }
+            catch (Exception Ex)
+            {
+                log.Error(Ex.Message, Ex);
+            }
         }
 
         private void descontarUnProducto(string idProducto,string cantidad)
         {
-           // string idProducto = dtRow["Id"].ToString();
-            CommonUtils.ConexionBD.AbrirConexion();
-            string sql = "SELECT Receta_Insumo.Cantidad, Receta_Insumo.InsumoId, Insumo.CantidadInsumoEnIventario, Insumo.Nombre FROM Receta_Insumo INNER JOIN Insumo ON Receta_Insumo.InsumoId = Insumo.InsumoId WHERE (Receta_Insumo.RecetaId = (SELECT RecetaId FROM Producto WHERE (ProductoId = " + idProducto + ")))";
-            DataTable temp = CommonUtils.ConexionBD.EjecutarConsulta(sql);
-            CommonUtils.ConexionBD.CerrarConexion();
-           
-            List<DataRow> insumosReceta = temp.AsEnumerable().ToList();// dataSet.Tables["InsumosReceta"].AsEnumerable().ToList();
-            foreach (DataRow item in insumosReceta)
+            try
             {
-                string cantidadNuevadeInsumo = (float.Parse(item[2].ToString()) - (float.Parse(cantidad) * float.Parse(item[0].ToString()))).ToString();
-                sql = "update Insumo set CantidadInsumoEnIventario=" + cantidadNuevadeInsumo + " where InsumoId=" + item[1].ToString();
-                CommonUtils.ConexionBD.Actualizar(sql);
+                log.Error("CalculadoraVentas - descontarUnProducto");
+                // string idProducto = dtRow["Id"].ToString();
+                CommonUtils.ConexionBD.AbrirConexion();
+                string sql = "SELECT Receta_Insumo.Cantidad, Receta_Insumo.InsumoId, Insumo.CantidadInsumoEnIventario, Insumo.Nombre FROM Receta_Insumo INNER JOIN Insumo ON Receta_Insumo.InsumoId = Insumo.InsumoId WHERE (Receta_Insumo.RecetaId = (SELECT RecetaId FROM Producto WHERE (ProductoId = " + idProducto + ")))";
+                DataTable temp = CommonUtils.ConexionBD.EjecutarConsulta(sql);
+                CommonUtils.ConexionBD.CerrarConexion();
+
+                List<DataRow> insumosReceta = temp.AsEnumerable().ToList();// dataSet.Tables["InsumosReceta"].AsEnumerable().ToList();
+                foreach (DataRow item in insumosReceta)
+                {
+                    string cantidadNuevadeInsumo = (float.Parse(item[2].ToString()) - (float.Parse(cantidad) * float.Parse(item[0].ToString()))).ToString();
+                    sql = "update Insumo set CantidadInsumoEnIventario=" + cantidadNuevadeInsumo + " where InsumoId=" + item[1].ToString();
+                    CommonUtils.ConexionBD.Actualizar(sql);
+                }
             }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message, ex);
+            }
+
         }
 
         private void guardarDineroEnCaja()
