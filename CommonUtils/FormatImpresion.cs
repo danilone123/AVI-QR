@@ -128,19 +128,28 @@ namespace CommonUtils
         #endregion
 
         #region function datos A empresa
-        private void fillDatosAEmpresa(ref StreamWriter streamToFill,
-                                       Int16 maxTextWidth,
-                                       String nombreEmpresa,
-                                       String razonSocial,
-                                       String sucursal,
-                                       String direccion,
-                                       String telefono,
-                                       String departamento)
+        private void fillDatosAEmpresa( ref StreamWriter streamToFill ,
+                                       Int16 maxTextWidth ,
+                                       String nombreEmpresa ,
+                                       String razonSocial ,
+                                       String sucursal ,
+                                       String direccion ,
+                                       String telefono ,
+                                       String departamento )
         {
-            streamToFill.WriteLine( strFormat.formatString( nombreEmpresa , Align.Center , maxTextWidth ) );
-            streamToFill.WriteLine( strFormat.formatString( razonSocial , Align.Center , maxTextWidth ) );
+            List<string> items;
+            
+            items = TextWrapper( nombreEmpresa , 38 );
+            this.PrintInLines( streamToFill , maxTextWidth , nombreEmpresa , items );
+
+            items = TextWrapper( razonSocial , 38 );
+            this.PrintInLines( streamToFill , maxTextWidth , razonSocial , items );
+
             streamToFill.WriteLine( strFormat.formatString( sucursal , Align.Center , maxTextWidth ) );
-            streamToFill.WriteLine( strFormat.formatString( direccion , Align.Center , maxTextWidth ) );
+
+            items = TextWrapper( direccion , 38 );
+            this.PrintInLines( streamToFill , maxTextWidth , direccion , items );
+
             streamToFill.WriteLine( strFormat.formatString( telefono , Align.Center , maxTextWidth ) );
             streamToFill.WriteLine( strFormat.formatString( departamento , Align.Center , maxTextWidth ) );
             streamToFill.WriteLine( );
@@ -333,6 +342,21 @@ namespace CommonUtils
             streamToFill.WriteLine( );
         }
 
+        private void PrintInLines( StreamWriter streamToFill , Int16 maxTextWidth , String longText , List<string> items )
+        {
+            if ( items.Count > 1 )
+            {
+                foreach ( var itemNames in items )
+                {
+                    streamToFill.WriteLine( strFormat.formatString( itemNames , Align.Center , 38 ) );
+                }
+            }
+            else
+            {
+                streamToFill.WriteLine( strFormat.formatString( longText , Align.Center , maxTextWidth ) );
+            }
+        }
+
         private List<string> TextWrapper( string sentence, int limit )
         {
             // The new result, will be turned into string[]
@@ -456,11 +480,11 @@ namespace CommonUtils
             streamToFill.WriteLine();
 
             streamToFill.WriteLine(strFormat.formatString("\"ESTA FACTURA CONTRIBUYE AL DESARROLLO", Align.Left, maxTextWidth));
-            streamToFill.WriteLine();
+           // streamToFill.WriteLine();
             streamToFill.WriteLine(strFormat.formatString("DEL PAIS.EL USO ILICITO DE ESTA SERA", Align.Left, maxTextWidth));
-            streamToFill.WriteLine();
+           // streamToFill.WriteLine();
             streamToFill.WriteLine(strFormat.formatString("SANCIONADO DE ACUERDO A LEY\"", Align.Left, maxTextWidth));
-            streamToFill.WriteLine();
+           // streamToFill.WriteLine();
             fillPiePaginaLeyenda(ref streamToFill, "Ley No. 453: Los productos deben suministrarse en condiciones de inocuidad, calidad y seguridad.", maxTextWidth);
             /*
             streamToFill.WriteLine(strFormat.formatString("\"LA ALTERACIÓN, FALSIFICACIÓN O", Align.Left, maxTextWidth));
