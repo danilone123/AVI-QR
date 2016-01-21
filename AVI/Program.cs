@@ -19,6 +19,7 @@ namespace AVI
 
             DevExpress.Skins.SkinManager.EnableFormSkins( );
             UserLookAndFeel.Default.SetSkinStyle( "The Asphalt World" );
+            /*
             CommonUtils.ConexionBD.StringDeConexion = CommonUtils.ConexionBD.GetConnectionString();
             CommonUtils.ConexionBD.AbrirConexion();
             System.Data.DataTable read = CommonUtils.ConexionBD.TraerTabla("Pedido");//("SELECT COUNT(*) FROM  Pedido");
@@ -41,7 +42,7 @@ namespace AVI
                     Application.Exit();
                     return;
                 }
-            }
+            }*/
             Application.Run( new FormLogin( ) );
         }
     }
